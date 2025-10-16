@@ -98,28 +98,36 @@ export type PerplexityChatCompletionResponse = z.infer<typeof FinalResponsePaylo
 
 class PerplexityApiService {
   private axiosInstance: AxiosInstance;
-  private apiKey: string;
+  private apiKey: string | undefined;
 
   constructor() {
-    this.apiKey = config.perplexityApiKey;
-    if (!this.apiKey) {
-      throw new McpError(
-        BaseErrorCode.CONFIGURATION_ERROR,
-        'PERPLEXITY_API_KEY environment variable is not set.',
-        {}
-      );
-    }
+    const trimmedKey = config.perplexityApiKey?.trim();
+    this.apiKey = trimmedKey ? trimmedKey : undefined;
 
     this.axiosInstance = axios.create({
       baseURL: config.perplexityApiBaseUrl,
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
       // Increase timeout for potentially long-running deep research tasks
       timeout: config.perplexityPollingTimeoutMs,
     });
+  }
+
+  private requireApiKey(context: RequestContext): string {
+    if (!this.apiKey) {
+      throw new McpError(
+        BaseErrorCode.CONFIGURATION_ERROR,
+        'PERPLEXITY_API_KEY environment variable is not set. Please configure it before calling Perplexity tools.',
+        {
+          requestId: context.requestId,
+          operation: context.operation,
+        },
+      );
+    }
+
+    return this.apiKey;
   }
 
   async chatCompletion(
@@ -139,9 +147,16 @@ class PerplexityApiService {
         logger.info(`[${operation}] Initiating chat completion request`, { ...context, model: requestData.model });
         logger.debug(`[${operation}] Request details`, { ...context, input: sanitizedInput });
 
+        const apiKey = this.requireApiKey(context);
+
         const response = await this.axiosInstance.post<PerplexityChatCompletionResponse>(
             '/chat/completions',
-            requestData
+            requestData,
+            {
+              headers: {
+                Authorization: `Bearer ${apiKey}`,
+              },
+            }
         );
         
         const finalResponse = response.data;

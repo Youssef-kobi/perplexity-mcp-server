@@ -1,8 +1,13 @@
-
 runtime: "typescript"
-entry: "src/index.ts"       # path to your MCP server file
-# For local/server bundle builds:
-target: "bundle"
-# For remote deployment:
-release:
-  branch: "main"            # branch to build from
+
+# This is your TypeScript entry point.
+entry: "src/index.ts"
+
+# The default build and launch configuration Smithery Cloud will follow.
+build:
+  command: ["npm", "run", "build"]
+  output: "dist"
+
+start:
+  command: ["node", "dist/index.js"]
+  port: 3010

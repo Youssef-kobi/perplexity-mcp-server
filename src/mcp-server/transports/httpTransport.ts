@@ -126,10 +126,14 @@ export async function startHttpTransport(
   // --- CORS ---
   // If no origins configured, allow "*". If you specify origins, we enable credentials.
   const hasCustomOrigins = !!(config.mcpAllowedOrigins && config.mcpAllowedOrigins.length);
+  const corsOrigin: string | string[] = hasCustomOrigins
+    ? config.mcpAllowedOrigins!
+    : "*";
+
   app.use(
     "*",
     cors({
-      origin: hasCustomOrigins ? config.mcpAllowedOrigins : "*",
+      origin: corsOrigin,
       allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
       allowHeaders: ["*", "Content-Type", "Mcp-Session-Id", "Last-Event-ID", "Authorization"],
       exposeHeaders: ["*"],
@@ -231,7 +235,7 @@ export async function startHttpTransport(
     app.post(p, handlePost);
     app.get(p, handleSessionRequest);
     app.delete(p, handleSessionRequest);
-    app.options(p, (c) => c.text("", 204)); // explicit preflight
+    app.options(p, (c) => c.body(null, 204)); // explicit preflight
   });
 
   return startHttpServerWithRetry(app, HTTP_PORT, HTTP_HOST, MAX_PORT_RETRIES, transportContext);

@@ -30,7 +30,7 @@ This server equips your AI with specialized tools to leverage Perplexity's uniqu
 
 | [Overview](#overview)           | [Features](#features)                   | [Installation](#installation) |
 | :------------------------------ | :-------------------------------------- | :---------------------------- |
-| [Configuration](#configuration) | [Project Structure](#project-structure) |
+| [Configuration](#configuration) | [Project Structure](#project-structure) | [Hosted Deployment](#hosted-deployment) |
 | [Tools](#tools)                 | [Development](#development)             | [License](#license)           |
 
 ## Overview
@@ -92,7 +92,17 @@ Leverages the robust utilities provided by the `mcp-ts-template`:
     npm install
     ```
 
-3.  Build the project:
+3.  Configure your Perplexity API key:
+
+    ```bash
+    cp .env.example .env
+    # Edit .env and set PERPLEXITY_API_KEY=your_real_key
+    ```
+
+    > The server reads `PERPLEXITY_API_KEY` from the environment. When you import this project into Smithery the **Environment** panel already includes an input for `PERPLEXITY_API_KEY`, so you can leave `.env` out of the repository and just paste your token into that field (see the [Hosted Deployment Guide](docs/hosted-deployment.md#adding-your-perplexity-api-key)). Smithery's official [hosted deployment walkthrough](https://smithery.ai/docs/deploy/hosted) also shows exactly where the field appears if you need UI context.
+
+4.  Build the project:
+
     ```bash
     npm run build
     ```
@@ -106,12 +116,12 @@ Configure the server by creating a `.env` file in the project root (you can copy
 | Variable              | Description                                                      | Default     |
 | :-------------------- | :--------------------------------------------------------------- | :---------- |
 | `PERPLEXITY_API_KEY`  | **Required.** Your API key for Perplexity.                       | `""`        |
-| `MCP_TRANSPORT_TYPE`  | Transport mechanism: `stdio` or `http`.                          | `stdio`     |
+| `MCP_TRANSPORT_TYPE`  | Transport mechanism: `stdio` or `http`.                          | `http`      |
 | `MCP_HTTP_PORT`       | Port for the HTTP server (if `MCP_TRANSPORT_TYPE=http`).         | `3010`      |
-| `MCP_HTTP_HOST`       | Host address for the HTTP server.                                | `127.0.0.1` |
+| `MCP_HTTP_HOST`       | Host address for the HTTP server.                                | `0.0.0.0`   |
 | `MCP_LOG_LEVEL`       | Logging level (`debug`, `info`, `warn`, `error`).                | `info`      |
-| `MCP_AUTH_MODE`       | Authentication for HTTP: `jwt` or `oauth`.                       | `jwt`       |
-| `MCP_AUTH_SECRET_KEY` | **Required for `jwt` auth.** A secure secret key (min 32 chars). | `""`        |
+| `MCP_AUTH_MODE`       | Authentication for HTTP: `none`, `jwt`, or `oauth`.              | `none`      |
+| `MCP_AUTH_SECRET_KEY` | Required when `MCP_AUTH_MODE=jwt`. Min 32 chars for security.     | `""`        |
 
 ### MCP Client Settings
 
@@ -150,6 +160,10 @@ src/
 ```
 
 For a detailed file tree, run `npm run tree` or see [docs/tree.md](docs/tree.md).
+
+## Hosted Deployment
+
+Looking to publish the server on a managed platform such as Smithery? Follow the step-by-step [Hosted Deployment Guide](docs/hosted-deployment.md) for build, environment, and troubleshooting tips tailored to Smithery's "Hosted" runtime.
 
 ## Tools
 

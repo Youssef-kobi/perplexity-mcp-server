@@ -38,6 +38,14 @@ try {
   console.error("Warning: Could not read package.json for default config values. Using hardcoded defaults.", error);
 }
 
+const defaultHttpPort = (() => {
+  const raw = process.env.PORT;
+  if (!raw) return 3010;
+
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 3010;
+})();
+
 const EnvSchema = z.object({
   MCP_SERVER_NAME: z.string().optional(),
   MCP_SERVER_VERSION: z.string().optional(),
@@ -47,7 +55,8 @@ const EnvSchema = z.object({
 
   // Hosted-friendly defaults:
   MCP_TRANSPORT_TYPE: z.enum(["stdio", "http"]).default("http"),
-  MCP_HTTP_PORT: z.coerce.number().int().positive().default(3010),
+  MCP_HTTP_PORT: z.coerce.number().int().positive().default(defaultHttpPort),
+  PORT: z.coerce.number().int().positive().optional(),
   MCP_HTTP_HOST: z.string().default("0.0.0.0"),
 
   // CORS: CSV list or "*" for permissive
@@ -79,6 +88,8 @@ if (!parsedEnv.success) {
 }
 
 const env = parsedEnv.success ? parsedEnv.data : EnvSchema.parse({});
+
+const effectiveHttpPort = env.MCP_HTTP_PORT ?? env.PORT ?? defaultHttpPort;
 
 // helper: normalize allowed origins
 function parseAllowedOrigins(raw?: string): string[] | undefined {
@@ -144,7 +155,7 @@ export const config = {
 
   // Transport + HTTP binding
   mcpTransportType: env.MCP_TRANSPORT_TYPE, // now defaults to "http"
-  mcpHttpPort: env.MCP_HTTP_PORT,           // now defaults to 3010
+  mcpHttpPort: effectiveHttpPort,           // prefer PORT/MCP_HTTP_PORT/env default
   mcpHttpHost: env.MCP_HTTP_HOST,           // now defaults to "0.0.0.0"
 
   // CORS list or undefined (= permissive)

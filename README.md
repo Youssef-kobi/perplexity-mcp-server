@@ -99,7 +99,7 @@ Leverages the robust utilities provided by the `mcp-ts-template`:
     # Edit .env and set PERPLEXITY_API_KEY=your_real_key
     ```
 
-    > The server reads `PERPLEXITY_API_KEY` from the environment. When you import this project into Smithery the **Environment** panel already includes an input for `PERPLEXITY_API_KEY`, so you can leave `.env` out of the repository and just paste your token into that field (see the [Hosted Deployment Guide](docs/hosted-deployment.md#adding-your-perplexity-api-key)). Smithery's official [hosted deployment walkthrough](https://smithery.ai/docs/deploy/hosted) also shows exactly where the field appears if you need UI context.
+    > The server reads `PERPLEXITY_API_KEY` from the environment. When you import this project into Smithery the **Environment** panel already includes an input for `PERPLEXITY_API_KEY`, so you can leave `.env` out of the repository and just paste your token into that field (see the [Hosted Deployment Guide](docs/hosted-deployment.md#adding-your-perplexity-api-key)).
 
 4.  Build the project:
 
@@ -164,10 +164,6 @@ For a detailed file tree, run `npm run tree` or see [docs/tree.md](docs/tree.md)
 ## Hosted Deployment
 
 Looking to publish the server on a managed platform such as Smithery? Follow the step-by-step [Hosted Deployment Guide](docs/hosted-deployment.md) for build, environment, and troubleshooting tips tailored to Smithery's "Hosted" runtime.
-
-> **Do I need to delete the auth code when hosting on Smithery?** No. Leave the built-in authentication helpers in place and simply keep `MCP_AUTH_MODE=none` (the default). Smithery's scanner and hosted runtime expect the endpoint to answer without a bearer token, while the auth modules remain available if you later self-host behind JWT or OAuth.
-
-> Tip: When your hosted deployment is running you can visit the `/` or `/mcp` path in a browser to see a small status page explaining how to connect with an MCP client. JSON responses only appear after a client opens a session with a POST `initialize` call.
 
 ## Tools
 

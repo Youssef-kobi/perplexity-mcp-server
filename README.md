@@ -99,7 +99,7 @@ Leverages the robust utilities provided by the `mcp-ts-template`:
     # Edit .env and set PERPLEXITY_API_KEY=your_real_key
     ```
 
-    > The server reads `PERPLEXITY_API_KEY` from the environment. When you import this project into Smithery the **Environment** panel already includes an input for `PERPLEXITY_API_KEY`, so you can leave `.env` out of the repository and just paste your token into that field (see the [Hosted Deployment Guide](docs/hosted-deployment.md#adding-your-perplexity-api-key)). Smithery's official [hosted deployment walkthrough](https://smithery.ai/docs/deploy/hosted) also shows exactly where the field appears if you need UI context.
+    > The server reads `PERPLEXITY_API_KEY` from the environment. When you import this project into Smithery the **Environment** panel already includes an input for `PERPLEXITY_API_KEY`, so you can leave `.env` out of the repository and just paste your token into that field (see the [Hosted Deployment Guide](docs/hosted-deployment.md#adding-your-perplexity-api-key)).
 
 4.  Build the project:
 

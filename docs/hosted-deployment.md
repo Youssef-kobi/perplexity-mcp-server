@@ -50,9 +50,7 @@ You can adjust the port if you prefer a different value, but remember to also up
 ### Adding your Perplexity API key
 
 - **Smithery hosted deployment** – Open your project on Smithery and go to **Environment**. The platform automatically lists a
-  `PERPLEXITY_API_KEY` input for this project; click the field, paste your live token, and press **Save** so the variable is injected when the container boots. You do not need to commit a `.env` file for hosted runs. If you need a visual walkthrough, Smithery's
-  ["Deploy your server to Smithery" guide](https://smithery.ai/docs/deploy/hosted) shows the Environment panel and where the
-  field appears in the UI.
+  `PERPLEXITY_API_KEY` input for this project; click the field, paste your live token, and press **Save** so the variable is injected when the container boots. You do not need to commit a `.env` file for hosted runs.
 - **Local development / self-hosting** – Copy `.env.example` to `.env` in the repository root and edit the file so
   `PERPLEXITY_API_KEY` contains your token. Any other environment variables defined in the file will also be loaded at startup.
 

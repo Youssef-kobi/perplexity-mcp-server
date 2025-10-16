@@ -14,6 +14,7 @@ import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { Context, Hono, Next } from "hono";
 import { cors } from "hono/cors";
 import http from "http";
+import type { IncomingMessage } from "http";
 import { randomUUID } from "node:crypto";
 import { config } from "../../config/index.js";
 import { BaseErrorCode, McpError } from "../../types-global/errors.js";
@@ -33,6 +34,37 @@ const MAX_PORT_RETRIES = 15;
 
 // In-memory session store (single-process only)
 const transports: Record<string, StreamableHTTPServerTransport> = {};
+
+function ensureSseFriendlyAcceptHeader(request: IncomingMessage): void {
+  const acceptHeader = request.headers.accept;
+  const requiredTypes = ["application/json", "text/event-stream"] as const;
+
+  const normalize = (value: string) => value.split(";")[0]?.trim().toLowerCase();
+
+  if (!acceptHeader) {
+    request.headers.accept = requiredTypes.join(", ");
+    return;
+  }
+
+  const entries = acceptHeader
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const normalized = entries.map(normalize);
+  let mutated = false;
+
+  requiredTypes.forEach((type) => {
+    if (!normalized.some((entry) => entry === type)) {
+      entries.push(type);
+      mutated = true;
+    }
+  });
+
+  if (mutated) {
+    request.headers.accept = entries.join(", ");
+  }
+}
 
 async function isPortInUse(
   port: number,
@@ -216,6 +248,8 @@ export async function startHttpTransport(
     } else if (!transport) {
       throw new McpError(BaseErrorCode.NOT_FOUND, "Invalid or expired session ID.");
     }
+
+    ensureSseFriendlyAcceptHeader(c.env.incoming);
 
     return await transport.handleRequest(c.env.incoming, c.env.outgoing, body);
   };

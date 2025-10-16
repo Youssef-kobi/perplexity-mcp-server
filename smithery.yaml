@@ -1,1 +1,8 @@
 
+runtime: "typescript"
+entry: "src/index.ts"       # path to your MCP server file
+# For local/server bundle builds:
+target: "bundle"
+# For remote deployment:
+release:
+  branch: "main"            # branch to build from

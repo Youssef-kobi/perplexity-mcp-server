@@ -50,9 +50,7 @@ You can adjust the port if you prefer a different value, but remember to also up
 ### Adding your Perplexity API key
 
 - **Smithery hosted deployment** – Open your project on Smithery and go to **Environment**. The platform automatically lists a
-  `PERPLEXITY_API_KEY` input for this project; click the field, paste your live token, and press **Save** so the variable is injected when the container boots. You do not need to commit a `.env` file for hosted runs. If you need a visual walkthrough, Smithery's
-  ["Deploy your server to Smithery" guide](https://smithery.ai/docs/deploy/hosted) shows the Environment panel and where the
-  field appears in the UI.
+  `PERPLEXITY_API_KEY` input for this project; click the field, paste your live token, and press **Save** so the variable is injected when the container boots. You do not need to commit a `.env` file for hosted runs.
 - **Local development / self-hosting** – Copy `.env.example` to `.env` in the repository root and edit the file so
   `PERPLEXITY_API_KEY` contains your token. Any other environment variables defined in the file will also be loaded at startup.
 
@@ -65,8 +63,6 @@ send any bearer tokens while it probes your endpoint, so forcing JWT or OAuth wi
 `401 Unauthorized`. If you need to secure a self-hosted deployment, set `MCP_AUTH_MODE` to `jwt` and supply a
 `MCP_AUTH_SECRET_KEY` that is at least 32 characters long. Hosted Smithery deployments should keep `MCP_AUTH_MODE=none` unless
 you front the service with your own gateway that injects credentials on behalf of the client.
-
-> **Should I rip out the authentication code since Smithery doesn't use it?** No. Leave the modules untouched. Keeping the authentication utilities in the codebase lets you flip on JWT or OAuth immediately if you later move to self-hosting or need to add an authenticating proxy in front of Smithery. The runtime behaves exactly the same as today so long as `MCP_AUTH_MODE` stays set to `none`.
 
 ## 4. CORS & Smithery Scanner Compatibility
 
@@ -91,6 +87,5 @@ curl https://<your-smithery-subdomain>.smithery.ai/healthz
 - **Initialize request keeps timing out** – Double-check that `npm run build` finishes successfully in your hosted build logs. Type errors prevent Smithery from publishing the `dist/` output.
 - **Port already in use** – The transport automatically increments the port up to 15 times. Update `MCP_HTTP_PORT` in the environment panel so Smithery and the server agree on the initial value.
 - **Non-text tool calls** – `src/utils/metrics/tokenCounter.ts` now ignores non-function tool calls instead of throwing. This is expected and keeps the build stable.
-- **Opening `/` or `/mcp` in a browser shows an info page instead of JSON** – That is expected. The endpoint only speaks the Model Context Protocol once an MCP client sends a POST `initialize` request. The server now returns a small HTML explainer (or a `400` JSON body) so you know the deployment is alive without providing an `Authorization` header.
 
 With these settings applied the Smithery "Hosted" deployment should reach the `Server is ready` state and the scanner will report a healthy MCP endpoint.

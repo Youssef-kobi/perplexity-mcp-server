@@ -222,8 +222,38 @@ export async function startHttpTransport(
 
   const handleSessionRequest = async (c: Context<{ Bindings: HttpBindings }>) => {
     const sessionId = c.req.header("mcp-session-id");
-    const transport = sessionId ? transports[sessionId] : undefined;
 
+    if (!sessionId) {
+      const acceptHeader = c.req.header("accept")?.toLowerCase() ?? "";
+      const isBrowserRequest = acceptHeader.includes("text/html");
+
+      const message =
+        "This endpoint speaks the Model Context Protocol over HTTP. " +
+        "Start a session with a POST request from a compatible MCP client (such as the Smithery scanner) " +
+        "instead of visiting it directly in a browser.";
+
+      if (isBrowserRequest) {
+        return c.html(`<!doctype html><html lang="en"><head><meta charset="utf-8" />
+          <title>Perplexity MCP Server</title>
+          <style>body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;margin:40px;line-height:1.5;max-width:720px;}
+          code{background:#f3f4f6;padding:2px 4px;border-radius:4px;}</style></head>
+          <body><h1>Perplexity MCP Server</h1><p>${message}</p>
+          <p>If you are seeing this while testing a Smithery deployment, use the
+          <strong>Test Connection</strong> button in the Smithery UI or an MCP-compatible
+          client instead of loading the URL directly.</p>
+          <p>For setup help see the <a href="https://github.com/perplexity-ai/perplexity-mcp-server/blob/main/docs/hosted-deployment.md">hosted deployment guide</a>.</p>
+          </body></html>`);
+      }
+
+      c.status(400);
+      return c.json({
+        error: "missing_session_id",
+        error_description: message,
+        documentation: "https://github.com/perplexity-ai/perplexity-mcp-server/blob/main/docs/hosted-deployment.md",
+      });
+    }
+
+    const transport = transports[sessionId];
     if (!transport) {
       throw new McpError(BaseErrorCode.NOT_FOUND, "Session not found or expired.");
     }

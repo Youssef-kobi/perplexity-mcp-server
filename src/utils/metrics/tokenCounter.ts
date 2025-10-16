@@ -109,13 +109,19 @@ export async function countChatTokens(
             message.tool_calls
           ) {
             for (const tool_call of message.tool_calls) {
-              if (tool_call.function.name) {
-                num_tokens += encoding.encode(tool_call.function.name).length;
-              }
-              if (tool_call.function.arguments) {
-                num_tokens += encoding.encode(
-                  tool_call.function.arguments,
-                ).length;
+              if ("function" in tool_call && tool_call.function) {
+                const { name, arguments: functionArguments } = tool_call.function;
+                if (name) {
+                  num_tokens += encoding.encode(name).length;
+                }
+                if (functionArguments) {
+                  num_tokens += encoding.encode(functionArguments).length;
+                }
+              } else {
+                logger.warning(
+                  `Encountered non-function tool call type during token counting. Ignoring token contribution.`,
+                  context,
+                );
               }
             }
           }
